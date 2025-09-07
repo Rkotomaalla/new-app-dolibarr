@@ -1,8 +1,17 @@
 <script setup>
 import ApiService from '@/service/ApiService';
 import MosService from '@/service/mos/MosService';
+import { computed } from 'vue';
 
+//affichage: 
 const load=ref(false);
+const evo=ref(0);
+const total=ref(0);
+const saving=computed(() => {
+  if(total.value===0) return "Enregistrement en cours... 0%"
+  return "Enregistrement en cours... "+((100*evo.value)/total.value).toFixed(0)+" %";
+});
+
 const emit=defineEmits(["dropRow"]);
 
 const savedMos=ref([]);
@@ -18,34 +27,70 @@ function supprimer(i){
 async function ToutFabriquer(){
     try{
       load.value=true;
+      let i=0;
+      evo.value=0;
+      total.value=props.listMos.length;
       for(let mos of props.listMos){
+          console.log(i+"/====================================================================");
+// config des donnes de Mos a creer 
+          console.log("config des donnes de Mos a creer");
           let data=await MosService.setMosData(mos.idBom,mos.qty,mos.type,mos.fk_product);
           let idMos=await MosService.saveMos(data);
-          let mosToProduce =await ApiService.getById("mos",idMos); 
-          let mostToSave=await MosService.setDataWithLines(mosToProduce.data);
-          let details=setPCDetails(mostToSave.lines);
           savedMos.value.push(idMos);
+
+          evo.value+=0.2;
+//detail de MOS enregistrer
+          console.log("detail de MOS enregistrer");
+          let mosToProduce =await ApiService.getById("mos",idMos);
+
+           evo.value+=0.2;
+//Validation du Mos
+          console.log("Validation du Mos");
+          await MosService.putValidate(mosToProduce,1);
+          
+           evo.value+=0.2;
+//configuratiosn de Mos a fabriquer
+          console.log("configuratiosn de Mos a fabriquer");
+          let mostToSave=await MosService.setDataWithLines(mosToProduce);
+          let details=await setPCDetails(mostToSave.lines,mostToSave);
+
+           evo.value+=0.2;
+          // enregistrement du mos
+          console.log("enregistrement du mos");
+          await MosService.postPC(details.consume,details.produce,details.inventory,mostToSave);
+
+           evo.value+=0.2;
+
+           i++;
       }
+      evo.value=0;
+      total.value=props.listMos.length;
+      load.value=!load;
     }catch (error){
-        await deleteAllMos();
+        // await deleteAllMos();
         throw error;
     }
 }
 
-function setPCDetails(lines){
+async function setPCDetails(lines,itemToSave){
   let toProduce=[];
   let toConsume=[];
   let inventory={};
   for(let line of lines ){
-    if(line.role==="toproduce"){
-        toProduce.push({
-          
-        });
+    let product=await ApiService.getById("products",line.fk_product); 
+    let obj={
+          objectid: line.fk_product,
+          qty:line.qty, 
+          fk_warehouse: Number(product.fk_default_warehouse)
     }
-    elseif(line.role==="toconsume"){
-
+    if(line.role==="toproduce"){
+        toProduce.push(obj);
+    }
+    else if (line.role==="toconsume"){
+      toConsume.push(obj);
     }
   }
+    inventory= await MosService.getMosInventoryCode(itemToSave);
   return {
     produce:toProduce,
     consume:toConsume,
@@ -103,7 +148,7 @@ async function deleteAllMos(){
         class="d-flex gap-4"
       >
         <VBtn type="submit" @click="ToutFabriquer" >
-          {{ load ? "Enregistrement en cours" : "Tout fabriquer" }}
+          {{ load ? saving : "Tout fabriquer" }}
         </VBtn>
         <VBtn
           color="secondary"

@@ -28,11 +28,13 @@ watchEffect(() => {
 });
 
 function setProductData(){
-    return {
+    let data=[]
+    data.push({
       objectid: prodDetail.value.objectid,
       qty:prodDetail.value.qty,
       fk_warehouse:Number(prodDetail.value.fk_warehouse)
-    }
+    });
+    return data;
 }
 onBeforeMount(async () => {
     try {

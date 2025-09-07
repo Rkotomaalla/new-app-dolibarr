@@ -47,13 +47,12 @@ export default{
             data.inventorycode=inventory.inventorycode;
             data.autoclose=1;
             data.arraytoconsume=consume;
-            data.arraytoproduce=[];
-            data.arraytoproduce.push(product);
+            data.arraytoproduce=product;
             
 
             let json=JSON.stringify(data);
             console.log(json);
-            // await axios.post(baseUrl+"mos/"+mosItem.id+"/produceandconsumeall",json,{headers});
+            await axios.post(baseUrl+"mos/"+mosItem.id+"/produceandconsumeall",json,{headers});
         }catch(error){
             throw error;
         }
@@ -177,7 +176,7 @@ export default{
                     let bomsDetail=await ApiService.getById("boms",idBom); 
                     id_product=bomsDetail.fk_product;
                 }
-                if(qty <= 0 || !qty || !type){
+                if(qty <= 0 || !qty || mosType===null){
                     throw new Error("les valeurs ne doivent pas etre vide");
                 }
                 let data={};

@@ -31,6 +31,7 @@ async function setMosInput(){
               data.qty=qty.value;
               data.fk_product=bomDetail.fk_product;
               data.refProduct=product.ref;
+              data.status=1;
             emitMos("sendMos",data);
             load.value=false;
           }
