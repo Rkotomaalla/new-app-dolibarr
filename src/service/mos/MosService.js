@@ -20,6 +20,7 @@ export default{
         }
     },
 
+    
     async putValidate(item,status){
         try{
             let mos={};
