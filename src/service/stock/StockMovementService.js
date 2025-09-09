@@ -18,4 +18,28 @@ export default {
         return res.data;
         }
     },
+    getMovementPerType(ListStockMovement){
+        let movPerType={}
+        movPerType.sortie=0;
+        movPerType.entree=0;
+        for(let list of ListStockMovement){
+                if(Number(list.qty) >= 0){
+                    movPerType.entree+=Number(list.qty);
+                }else movPerType.sortie+=Number(list.qty);
+        } 
+        return movPerType;  
+    },
+
+    getStockInitialPerProduct(ListStockMouvement){
+        let initialStock={};
+        let stockInitialRow=ListStockMouvement.filter(list => list.inventorycode===null && list.qty!==null);
+        if(stockInitialRow.length > 0){
+            initialStock.idStock=stockInitialRow[0].id;
+            initialStock.initialStock=stockInitialRow[0].qty;
+        }else{
+            initialStock.idStock=undefined;
+            initialStock.initialStock=0;
+        }
+        return initialStock;
+    }
 }

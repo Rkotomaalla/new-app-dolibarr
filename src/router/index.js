@@ -47,6 +47,10 @@ const router = createRouter({
               path: 'mos',
               component: () => import('../pages/mos/ListMos.vue')
             },
+            {
+              path: 'stock',
+              component:() => import('../pages/stock/ListMovement.vue')
+            }
           ]
         },
 

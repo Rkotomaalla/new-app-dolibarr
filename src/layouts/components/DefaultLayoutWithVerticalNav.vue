@@ -84,7 +84,7 @@ const upgradeBanner = computed(() => {
         }"
       />
 
-      <!-- 👉 Pages -->
+      <!-- 👉Ordre de fabricationn=================================================== -->
       <VerticalNavSectionTitle
         :item="{
           heading: 'Ordre de Fabrication',
@@ -113,6 +113,21 @@ const upgradeBanner = computed(() => {
         }"
       />
       
+
+      <!-- 👉stocks=================================================== -->
+      <VerticalNavSectionTitle
+        :item="{
+          heading: 'Stocks',
+        }"
+      />
+      <VerticalNavLink
+        :item="{
+          title: 'Mouvements de Stocks',
+          icon: 'bx-align-justify',
+          to: '/list/stock',
+        }"
+      />
+
       <!-- 👉 User Interface -->
       <VerticalNavSectionTitle
         :item="{
